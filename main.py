@@ -41,8 +41,8 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
 
 
 
-myHostname = "demorediss.redis.cache.windows.net"
-myPassword = "Lss3FXIzW6h1D5P6TqljrI8KRja3yGNtYAzCaHVMZrI="
+myHostname = "<hostname>"
+myPassword = "<password>"
 
 # Connect to Redis
 r = redis.StrictRedis(host=myHostname, port=6380, password=myPassword, ssl=True)
