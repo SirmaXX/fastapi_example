@@ -22,10 +22,6 @@ Example  service for job applyment
 6.  Rate limit each user ID to 4 requests per minute. Return a 429 Rate Limit
 7. If multiple concurrent streams occur for one user, they should share the same rate limit but have independent visit counts and stream sequence numbers.
 
-       
-
-       
-
 
 ## Uncompleted tasks
  1.  When "stream=false", respond immediately with a single payload including "stream_seq=0".
