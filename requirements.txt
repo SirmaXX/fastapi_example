@@ -1,0 +1,6 @@
+fastapi
+slowapi
+pydantic
+typing
+guvicorn
+pydantic
