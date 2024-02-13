@@ -1,10 +1,13 @@
 
 
 from pydantic import BaseModel
+
+
 class User(BaseModel):
     username: str
     email: str = None
     group: str = None
+    visitcount: int = 0
 
 class UserInDB(User):
     hashed_password: str
@@ -16,7 +19,7 @@ fake_users_db = {
         "email": "johndoe@example.com",
         "hashed_password": "fakehashedsecret",
         "group": "group1",
-        "visitcount": 0
+        "visitcount": 6
     },
     "alice": {
         "id": 451,

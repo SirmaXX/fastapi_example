@@ -1,15 +1,14 @@
 
 import fastapi
 import redis
-from fastapi import Depends, FastAPI, HTTPException, status,Request
-
+from fastapi import Depends, FastAPI, HTTPException, status,Request,Query
+from typing import Optional
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from typing import Annotated
 from Lib.models import UserInDB,fake_users_db,User
-
+import time
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -18,19 +17,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 def get_user(db, username: str):
     user_dict = db.get(username)
     if user_dict:
-        return UserInDB(**user_dict)
-
-def fake_decode_token(token):
-    # This doesn't provide any security at all
-    # Check the next version
-    user = get_user(fake_users_db, token)
-    return user
-    
+        return UserInDB(**user_dict)  
     
     
     
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-    user = fake_decode_token(token)
+    user = get_user(fake_users_db, token)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -38,6 +30,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
+
 
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
     if current_user:
@@ -79,9 +72,22 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @app.get("/users/me", description="kullanıcıyı gösterir")
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
-    return {"welcome to ": current_user.username + " group " + current_user.group}
+@limiter.limit("5/minute")
+async def read_users_me(request: fastapi.Request,current_user: User = Depends(get_current_active_user), stream: Optional[bool] = Query(False)):   
+    if current_user.visitcount > 10:
+        raise HTTPException(status_code=429, detail="Rate limit exceeded")
     
+    
+    if stream:
+        stream_responses = []
+        for i in range(5):
+            response_data ={ "welcome to ": current_user.username + " group " + current_user.group + " saddsa " + str(current_user.visitcount)   }
+            stream_responses.append(response_data.copy())
+            time.sleep(1)  # Delay by 1 second
+        return stream_responses
+    else:
+      return {"welcome to ": current_user.username + " group " + current_user.group + " saddsa " + str(current_user.visitcount) } 
+     
     
     
     
