@@ -57,7 +57,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 
-@app.post("/token")
+@app.post("/token", description="token kontrol")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user_dict = fake_users_db.get(form_data.username)
     if not user_dict:
@@ -71,7 +71,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 
-@app.get("/users/me", description="kullanıcıyı gösterir")
+@app.get("/users/me", description="kullanıcıyı gösterir not:visitcount 10 den fazla ise 429 hata verir")
 @limiter.limit("5/minute")
 async def read_users_me(request: fastapi.Request,current_user: User = Depends(get_current_active_user), stream: Optional[bool] = Query(False)):   
     if current_user.visitcount > 10:
@@ -83,7 +83,7 @@ async def read_users_me(request: fastapi.Request,current_user: User = Depends(ge
         for i in range(5):
             response_data ={ "welcome to ": current_user.username + " group " + current_user.group + " saddsa " + str(current_user.visitcount)   }
             stream_responses.append(response_data.copy())
-            time.sleep(1)  # Delay by 1 second
+            time.sleep(1)  
         return stream_responses
     else:
       return {"welcome to ": current_user.username + " group " + current_user.group + " saddsa " + str(current_user.visitcount) } 
