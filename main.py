@@ -81,12 +81,12 @@ async def read_users_me(request: fastapi.Request,current_user: User = Depends(ge
     if stream:
         stream_responses = []
         for i in range(5):
-            response_data ={ "welcome to ": current_user.username + " group " + current_user.group + " saddsa " + str(current_user.visitcount)   }
+            response_data ={ "welcome to ": current_user.username + " group: " + current_user.group + " id:" + str(current_user.visitcount)   }
             stream_responses.append(response_data.copy())
             time.sleep(1)  
         return stream_responses
     else:
-      return {"welcome to ": current_user.username + " group " + current_user.group + " saddsa " + str(current_user.visitcount) } 
+      return {"welcome to ": current_user.username + " group " + current_user.group + " id: " + str(current_user.visitcount) } 
      
     
     
